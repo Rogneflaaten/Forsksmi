@@ -1,0 +1,191 @@
+---
+title: "Studiedesign - The Repeat Study"
+author: "Torkil Rogneflåten"
+format:
+  revealjs:
+    center-title-slide: true
+    execute:
+      echo: false
+    logo: inn_logo.png
+    bibliography: references.bib
+    csl: apa.csl
+    theme: serif
+---
+
+## Forskningsspørsmål {.scrollable}
+
+::: {.fragment .highlight-red}
+- Er individers ulike endringer i VO~2maks~ reproduserbare ved gjentakende treningsperioder med utholdenhetstrening?
+:::
+
+- Varierer individers treningseffekt mellom treningsmoduler? (styrke vs utholdenhet)
+
+- Hva forårsaker treningseffektforskjeller mellom personer?
+
+- Viktigheten av sentrale vs perifere faktorer for utholdenhetsprestasjon og VO~2maks~?
+
+- Er forbedringer i "laktatterskel" forbundet med forbedringer i mitokondriell funksjon?
+
+- Skjer det tilpassninger i SR ved trening?
+
+# Bakgrunn og signifikans
+
+## 
+
+```{r}
+library(tidyverse)
+set.seed(4)
+data <- data.frame(y = rep(rnorm(n = 17, mean = 424, sd = 207), 2),
+                   x = c(rep("Treningsperiode 1", 17), rep("Treningsperiode 2", 17)))
+
+ggplot(data, aes(x = x, y = y)) +
+  geom_point(shape = 21, size = 6, fill = "Lightgrey", alpha = 0.8) +
+  theme_classic() +
+  scale_y_continuous(breaks = seq(100, 900, 100)) +
+  labs(x = "",
+       y = "Endring i VO2maks (mL/min)") +
+  theme(axis.title = element_text(size = 20),
+        axis.text = element_text(size = 20),
+        panel.border = element_rect(fill = NA))
+```
+
+::: footer
+Treningsperiode 1 er simulert data fra [@montero_refuting_2017]
+:::
+
+## 
+
+```{r}
+ggplot(data, aes(x = x, y = y)) +
+  geom_point(shape = 21, size = 6, fill = "Lightgrey", alpha = 0.8) +
+  theme_classic() +
+  scale_y_continuous(breaks = seq(100, 900, 100)) +
+  labs(x = "",
+       y = "Endring i VO2maks (mL/min)") +
+  theme(axis.title = element_text(size = 20),
+        axis.text = element_text(size = 20),
+        panel.border = element_rect(fill = NA)) +
+  geom_segment(x = 1.1, xend = 1.9, y = 810, yend = 810, color = "Red", size = 2, linetype = 2) +
+  geom_segment(x = 1.1, xend = 1.9, y = 760, yend = 760, color = "Red", size = 2, linetype = 2) +
+  geom_segment(x = 1.1, xend = 1.9, y = 500, yend = 180, color = "Red", size = 2, linetype = 2) +
+  geom_segment(x = 1.1, xend = 1.9, y = 180, yend = 500, color = "Red", size = 2, linetype = 2) +
+  annotate(geom = "text", label = "A", size = 8, color = "Red", x = 1.5, y = 720) +
+  annotate(geom = "text", label = "B", size = 8, color = "Red", x = 1.5, y = 290) 
+```
+
+::: footer
+Treningsperiode 1 er simulert data fra [@montero_refuting_2017]
+:::
+
+## Hvordan skal vi strukture studien for å svare på forskningspørsmålet?
+
+- Er individers ulike endringer i VO~2maks~ reproduserbare ved gjentakende treningsperioder med utholdenhetstrening?
+
+::: {.fragment}
+  * To eller flere treningsperioder med pre- og posttestning for hver av periodene
+:::
+
+##
+
+```{r}
+library(ggmulti)
+library(png)
+
+
+cycling <- png::readPNG("cycling.png")
+
+VO2 <- "\U2193"
+
+cycling_data <- data.frame(uker = c(4, 20),
+                           belastning = c(2, 2))
+
+data.frame(uker = seq(-8,31, by = 1),
+           belastning = c(rep(0, times = 8), rep(4, times = 8), rep(0, times = 8), rep(4, times = 8), rep(0, times = 8))) %>% 
+  ggplot(aes(uker, belastning)) +
+  geom_step(size = 2) +
+  ylim(0, 10) + 
+  scale_x_continuous(breaks = c(0, 8, 16, 24), expand = c(0.1, 0.5)) +
+  theme_classic() +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.text.x = element_text(size = 20),
+        axis.line = element_line(arrow = arrow(angle = 25, length = unit(0.4,"cm"),type = "closed"), size = 1.5),
+        axis.title = element_text(size = 20),
+        title = element_text(size = 20)) +
+  labs(x = "Tid (uker)",
+       y = "Treningsbelastning",
+       title = "Repeterte pre-post intervensjonsstudier",
+       subtitle = "Ikke-randomisert innenfor-gruppe design") +
+  annotate("text", x = c(-1, 9, 15, 25), y = rep(5.5), label = rep(VO2, 4), vjust = 0, size = 14) +
+  annotate("text", x = c(-1, 9, 15, 25), y = rep(7), label = rep(expression(VO["2max"])), vjust = 0, size = 6.5, color = "Blue") +
+  geom_image_glyph(data = cycling_data,
+                   mapping = aes(x = uker, y = belastning),
+                   images = cycling,
+                   imagewidth = rep(3),
+                   imageheight = c(2.25))
+```
+
+
+## Hvem er deltakerne, og hvordan rekrutteres de?
+
+:::: {.columns}
+
+::: {.column width="50%"}
+- Deltakere
+  * Utrente 
+  * Friske
+  * Voksne
+  * Deltakere fra tidligere styrketreningsstudier
+:::
+
+::: {.column width="50%"}
+- Seleksjonskriterier
+  * Deltaker i Alpha & Omega-, Contratrain- eller Relief-studien
+  * < èn utholdenhetsøkt i uka det siste året
+  * Frisk og i alderen 30-65 år
+:::
+
+::::
+
+## Hvilke målinger skal vi gjøre?
+
+:::: {.columns}
+
+::: {.column width="50%"}
+- Variabler
+  * VO~2max~
+  * Endring i VO~2max~
+  * Reliabiliteten til VO~2max~-endringer
+:::
+
+::: {.column width="50%"}
+- Konfunderende variabler
+  * Stressnivå
+  * Næringsinntak
+  * Sykdom
+:::
+
+:::: 
+
+## Hvordan skal den analyseres?
+
+- Hypothese
+  * VO~2max~-endringer er reproduserbare
+- Analyser
+  * Mixed effects model (deltakere som random effekt)
+  * Intraklassekorrelasjon (ICC) 
+- Utvalgsstørrelse
+  * Tidligere studier indikerer ICC = 0.45 [@bouchard_familial_1999; @marsh_fitness_2020]
+  * (ICC = 0.45, alpha = 0.05, beta = 0.8) = ~44 deltakere
+
+## Referanser
+
+
+
+
+
+
+
+
+
+
