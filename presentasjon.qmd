@@ -28,16 +28,35 @@ format:
 
 - Skjer det tilpassninger i SR ved trening?
 
-# Bakgrunn og signifikans
-
-## 
+## Hva er det vi egentlig spør om?
 
 ```{r}
 library(tidyverse)
 set.seed(4)
-data <- data.frame(y = rep(rnorm(n = 17, mean = 424, sd = 207), 2),
-                   x = c(rep("Treningsperiode 1", 17), rep("Treningsperiode 2", 17)))
+data <- data.frame(y = rep(rnorm(n = 17, mean = 424, sd = 207), 4),
+                   x = c(rep("Intervensjon 1", 17), rep("Intervensjon 2", 17), rep("Intervensjon 3", 17), rep("Intervensjon 4", 17)))
 
+
+data %>% 
+  filter(x == "Intervensjon 1") %>% 
+  ggplot(aes(x = x, y = y)) +
+    geom_point(shape = 21, size = 6, fill = "Lightgrey", alpha = 0.8) +
+    theme_classic() +
+    scale_y_continuous(breaks = seq(100, 900, 100)) +
+    labs(x = "",
+         y = "Endring i VO2maks (mL/min)") +
+    theme(axis.title = element_text(size = 20),
+          axis.text = element_text(size = 20),
+          panel.border = element_rect(fill = NA))
+```
+
+::: footer
+Endringsdata er simulert fra [@montero_refuting_2017]
+:::
+
+## Hva er det vi egentlig spør om?
+
+```{r}
 ggplot(data, aes(x = x, y = y)) +
   geom_point(shape = 21, size = 6, fill = "Lightgrey", alpha = 0.8) +
   theme_classic() +
@@ -50,10 +69,10 @@ ggplot(data, aes(x = x, y = y)) +
 ```
 
 ::: footer
-Treningsperiode 1 er simulert data fra [@montero_refuting_2017]
+Endringsdata er simulert fra [@montero_refuting_2017]
 :::
 
-## 
+## Hva er det vi egentlig spør om?
 
 ```{r}
 ggplot(data, aes(x = x, y = y)) +
@@ -69,21 +88,29 @@ ggplot(data, aes(x = x, y = y)) +
   geom_segment(x = 1.1, xend = 1.9, y = 760, yend = 760, color = "Red", size = 2, linetype = 2) +
   geom_segment(x = 1.1, xend = 1.9, y = 500, yend = 180, color = "Red", size = 2, linetype = 2) +
   geom_segment(x = 1.1, xend = 1.9, y = 180, yend = 500, color = "Red", size = 2, linetype = 2) +
-  annotate(geom = "text", label = "A", size = 8, color = "Red", x = 1.5, y = 720) +
-  annotate(geom = "text", label = "B", size = 8, color = "Red", x = 1.5, y = 290) 
+  geom_segment(x = 2.1, xend = 2.9, y = 810, yend = 810, color = "Red", size = 2, linetype = 2) +
+  geom_segment(x = 2.1, xend = 2.9, y = 760, yend = 760, color = "Red", size = 2, linetype = 2) +
+  geom_segment(x = 2.1, xend = 2.9, y = 180, yend = 500, color = "Red", size = 2, linetype = 2) +
+  geom_segment(x = 2.1, xend = 2.9, y = 500, yend = 180, color = "Red", size = 2, linetype = 2) +
+  geom_segment(x = 3.1, xend = 3.9, y = 810, yend = 810, color = "Red", size = 2, linetype = 2) +
+  geom_segment(x = 3.1, xend = 3.9, y = 760, yend = 760, color = "Red", size = 2, linetype = 2) +
+  geom_segment(x = 3.1, xend = 3.9, y = 180, yend = 500, color = "Red", size = 2, linetype = 2) +
+  geom_segment(x = 3.1, xend = 3.9, y = 500, yend = 180, color = "Red", size = 2, linetype = 2) +
+  annotate(geom = "text", label = "A", size = 8, color = "Red", x = 2.5, y = 720) +
+  annotate(geom = "text", label = "B", size = 8, color = "Red", x = 2.5, y = 270) 
 ```
 
 ::: footer
-Treningsperiode 1 er simulert data fra [@montero_refuting_2017]
+Endringsdata er simulert fra [@montero_refuting_2017]
 :::
 
 ## Hvordan skal vi strukture studien for å svare på forskningspørsmålet?
 
 - Er individers ulike endringer i VO~2maks~ reproduserbare ved gjentakende treningsperioder med utholdenhetstrening?
-
-::: {.fragment}
-  * To eller flere treningsperioder med pre- og posttestning for hver av periodene
-:::
+  * Reliabilitetsstudie
+  * Minimum to treningsintervensjoner med de samme individene
+  * Måle VO~2maks~ før og etter hver treningsintervensjon
+  * Viktig at de får en treningseffekt av intervensjonen 
 
 ##
 
@@ -97,10 +124,14 @@ cycling <- png::readPNG("cycling.png")
 VO2 <- "\U2193"
 
 cycling_data <- data.frame(uker = c(4, 20),
-                           belastning = c(2, 2))
+                           belastning = c(3, 3))
 
 data.frame(uker = seq(-8,31, by = 1),
-           belastning = c(rep(0, times = 8), rep(4, times = 8), rep(0, times = 8), rep(4, times = 8), rep(0, times = 8))) %>% 
+           belastning = c(rep(1, times = 8), 
+                          rep(5, times = 8), 
+                          rep(1, times = 8), 
+                          rep(5, times = 8), 
+                          rep(1, times = 8))) %>% 
   ggplot(aes(uker, belastning)) +
   geom_step(size = 2) +
   ylim(0, 10) + 
@@ -109,7 +140,10 @@ data.frame(uker = seq(-8,31, by = 1),
   theme(axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
         axis.text.x = element_text(size = 20),
-        axis.line = element_line(arrow = arrow(angle = 25, length = unit(0.4,"cm"),type = "closed"), size = 1.5),
+        axis.line = element_line(arrow = arrow(angle = 25, 
+                                               length = unit(0.4,"cm"),
+                                               type = "closed"),
+                                 size = 1.5),
         axis.title = element_text(size = 20),
         title = element_text(size = 20)) +
   labs(x = "Tid (uker)",
@@ -162,10 +196,13 @@ data.frame(uker = seq(-8,31, by = 1),
 - Konfunderende variabler
   * Stressnivå
   * Næringsinntak
+  * Søvnkvalitet
   * Sykdom
+  * carry-over effects
 :::
 
 :::: 
+
 
 ## Hvordan skal den analyseres?
 
